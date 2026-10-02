@@ -1,0 +1,53 @@
+{
+  "name": "Нізащо Мила",
+  "sheetCsvUrl": "",
+  "cloudflareProject": "nizashcho-myla-map",
+  "countries": ["UKR"],
+
+  "texts": {
+    "title": "Мила, де пиво? · Нізащо Мила",
+    "heading": "Мила, де пиво?",
+    "subheading": "Тут наливають і продають Нізащо Мила",
+    "panelLabel": "Де купити пиво Нізащо Мила",
+    "logoAlt": "Нізащо Мила, сімейна броварня"
+  },
+
+  "images": {
+    "logo": "logo.jpg",
+    "near": "near.png"
+  },
+
+  "font": {
+    "family": "Montserrat",
+    "googleWeights": [500, 600, 700, 800, 900],
+    "fallback": "'Segoe UI', Roboto, Arial, sans-serif"
+  },
+
+  "colors": {
+    "cream": "#F0EFE6",
+    "paper": "#FAF9F4",
+    "navy": "#26325A",
+    "navy2": "#3B4876",
+    "orange": "#E4632B",
+    "gold": "#96803F",
+    "line": "#DCD8C8",
+    "muted": "#6E7188"
+  },
+
+  "basemap": {
+    "background": "#F0EFE6",
+    "water": "#B9DDE9",
+    "park": "#DDE3CC",
+    "building": "#E4E1D5",
+    "label": "#3B4876"
+  },
+
+  "marker": {
+    "shape": "cap",
+    "text": "НМ",
+    "colors": { "shop": "#26325A", "bar": "#E4632B" }
+  },
+
+  "cityOrder": ["Одеса", "Луцьк"],
+  "focusCity": "Одеса"
+}

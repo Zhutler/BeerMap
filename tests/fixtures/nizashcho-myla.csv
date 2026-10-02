@@ -1,0 +1,18 @@
+name,type,city,street,house,old_street,instagram,gmaps_url,place_id,lat,lng,note,active
+Пиво Плюс,shop,Одеса,вулиця Балківська,30,,,,ChIJb6iZ570xxkAR_hDFd5Bt1zI,,,,TRUE
+BuduPivo,shop,Одеса,вулиця Олександра Свища,38,вулиця Середня,budupivo,https://maps.app.goo.gl/vS65CZ6dNNDUgu8K7,,"46,472463","30,710500",,TRUE
+BuduPivo,shop,Одеса,вулиця Головківська,25,,budupivo,,ChIJ1dgcMwAzxkARpeQCMJB7ZGU,,,,TRUE
+BuduPivo,shop,Одеса,вулиця Болгарська,87а,,budupivo,,,,,,TRUE
+DreamBeer,shop,Одеса,вулиця Степова,34,,dreambeer22,,,,,,TRUE
+Brewer Beer Culture Shop,shop,Одеса,вулиця Перлинна,5-Б,,brewer_beer_culture_shop,,ChIJH3jTkGzLx0ARPZ-oMmNApB4,,,У ТРЦ «Перлина». Пивний магазин зі стильним дизайном.,TRUE
+Shanson Bar,bar,Одеса,Фонтанська дорога,153,,shanson_bar_odessa,,ChIJKYeiSJE0xkARDGCKKzVqpDU,,,Смачно поїсти й випити келих на березі моря.,TRUE
+ViBeer,shop,Одеса,вулиця Євгена Чикаленка,75,вулиця Академіка Вільямса,,,ChIJAfR9Dm41xkARtaiJseP05wo,,,,TRUE
+М'ясоїд,shop,Одеса,вулиця Ніжинська,79,,myasoed.odessa,,ChIJpQj96pAxxkARtYSCr_v-_Ps,,,,TRUE
+Ржавий Краб,bar,Одеса,вулиця Гаванна,7,,rzhaviy.crab,,ChIJ7YKCkEYxxkARrhAJdyK-P0I,,,Паб із соковитими бургерами.,TRUE
+Наше Пиво,shop,Одеса,вулиця Кінна,22,,,,ChIJZWQ7oOoxxkARs7jE-qjktMc,,,,TRUE
+Mr. Beers,shop,Одеса,вулиця В'ячеслава Самофалова,16а/2,вулиця Каманіна,,,ChIJ_2PVifA1xkARC5-TiCmgH9Y,,,,TRUE
+Не Каблук,shop,Одеса,вулиця Олексія Вадатурського,19,вулиця Маршала Малиновського,ne_kabluk_craft_beer_store_,,ChIJh0SKRqIzxkARoYDFQerrU4A,,,Територія розливного пива на Черемушках.,TRUE
+Бородате Пиво,shop,Луцьк,вулиця В'ячеслава Чорновола,40,,borodate.pyvo,,ChIJL9yybqmRJUcRc-eJcbIL06Y,,,,TRUE
+Бородате Пиво,shop,Луцьк,вулиця Привокзальна,10а,,borodate.pyvo,,ChIJM-FOjKyXJUcRjUuxr1kZqPI,,,,TRUE
+Бородате Пиво,shop,Луцьк,вулиця Івана Франка,57,,borodate.pyvo,,ChIJL4uF6ZCZJUcR2L--CEVKyl4,,,,TRUE
+Бородате Пиво,shop,Луцьк,вулиця Рівненська,4,,borodate.pyvo,,ChIJszMS6UKXJUcRfWooWBaecS0,,,,TRUE

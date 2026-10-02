@@ -1,0 +1,30 @@
+{
+  "name": "beermap",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Карти «Де купити» для пивоварень: шаблон + конфіг клієнта + Google-таблиця",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node build/build.mjs",
+    "build:offline": "node build/build.mjs --offline",
+    "masks": "node build/update-masks.mjs",
+    "test": "node --test tests/unit/",
+    "test:e2e": "playwright test",
+    "serve": "node tests/serve.mjs"
+  },
+  "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "0.1.4",
+    "@turf/buffer": "7.4.0",
+    "@turf/helpers": "7.4.0",
+    "@turf/simplify": "7.4.0",
+    "@turf/union": "7.4.0",
+    "csv-parse": "7.0.3",
+    "leaflet": "1.9.4",
+    "leaflet.markercluster": "1.5.3",
+    "maplibre-gl": "4.7.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
