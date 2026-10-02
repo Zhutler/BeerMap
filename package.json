@@ -4,7 +4,9 @@
   "private": true,
   "description": "Карти «Де купити» для пивоварень: шаблон + конфіг клієнта + Google-таблиця",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node build/build.mjs",
     "build:offline": "node build/build.mjs --offline",
@@ -25,6 +27,8 @@
     "maplibre-gl": "4.7.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.56.1"
+    "@playwright/test": "1.56.1",
+    "@turf/boolean-point-in-polygon": "^7.4.0",
+    "@turf/distance": "^7.4.0"
   }
 }
