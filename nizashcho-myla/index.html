@@ -234,15 +234,30 @@ try {
 map.setMaxZoom(19);
 
 /* ---------- маркери ---------- */
+// Форми маркера (client.json → marker.shape): кришка від пляшки, бджолина сота, крапля меду.
+const SHAPES = {
+  cap() { // зубчасте коло
+    let d = ''; const n = 21, R = 18, r = 15.2;
+    for (let i = 0; i <= n * 2; i++) { const a = i * Math.PI / n; const rr = i % 2 ? r : R; d += (i ? 'L' : 'M') + (19 + rr * Math.cos(a)).toFixed(2) + ' ' + (19 + rr * Math.sin(a)).toFixed(2); }
+    return { outer: `${d}Z`, cx: 19, cy: 19, r: 10.5 };
+  },
+  hex() { // шестикутник «сота», вершиною вгору
+    let d = '';
+    for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i - Math.PI / 2; d += (i ? 'L' : 'M') + (19 + 17.5 * Math.cos(a)).toFixed(2) + ' ' + (19 + 17.5 * Math.sin(a)).toFixed(2); }
+    return { outer: `${d}Z`, cx: 19, cy: 19, r: 10.5 };
+  },
+  drop() { // крапля: гострий верх, кругле дно
+    return { outer: 'M19 1.5C19 1.5 5.5 15.5 5.5 23.5a13.5 13.5 0 0 0 27 0C32.5 15.5 19 1.5 19 1.5Z', cx: 19, cy: 23.5, r: 9.5 };
+  },
+};
 function markerSvg(type, size) {
   const M = cfg.marker, fill = M.colors[type] || C.navy;
   const st = size ? ` style="width:${size}px;height:${size}px"` : '';
-  // кришка від пляшки: зубчасте коло
-  let d = ''; const n = 21, R = 18, r = 15.2;
-  for (let i = 0; i <= n * 2; i++) { const a = i * Math.PI / n; const rr = i % 2 ? r : R; d += (i ? 'L' : 'M') + (19 + rr * Math.cos(a)).toFixed(2) + ' ' + (19 + rr * Math.sin(a)).toFixed(2); }
-  return `<svg class="cap"${st} viewBox="0 0 38 38"><path d="${d}Z" fill="${fill}" stroke="${C.gold}" stroke-width="1.6"/>
-    <circle cx="19" cy="19" r="10.5" fill="${C.cream}"/>
-    <text x="19" y="23" text-anchor="middle" font-family="${esc(cfg.fontFamily)},Arial" font-weight="900" font-size="10.5" fill="${fill}">${esc(M.text)}</text></svg>`;
+  const g = (SHAPES[M.shape] || SHAPES.cap)();
+  const fs = (M.text || '').length > 2 ? 8.5 : 10.5;
+  return `<svg class="cap"${st} viewBox="0 0 38 38"><path d="${g.outer}" fill="${fill}" stroke="${C.gold}" stroke-width="1.6" stroke-linejoin="round"/>
+    <circle cx="${g.cx}" cy="${g.cy}" r="${g.r}" fill="${C.cream}"/>
+    <text x="${g.cx}" y="${g.cy + fs * 0.38}" text-anchor="middle" font-family="${esc(cfg.fontFamily)},Arial" font-weight="900" font-size="${fs}" fill="${fill}">${esc(M.text)}</text></svg>`;
 }
 const icon = type => L.divIcon({ html: markerSvg(type), className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18] });
 
@@ -330,7 +345,8 @@ const km = (a, b) => {
 };
 const fmtKm = d => d < 1 ? `${Math.round(d * 1000 / 10) * 10} м` : d < 20 ? `${d.toFixed(1).replace('.', ',')} км` : `${Math.round(d)} км`;
 
-const openCities = new Set(CITY_ORDER);
+// розгорнуті міста: з cityOrder, а якщо порядок не задано, то головне місто (де найбільше точок)
+const openCities = new Set(CITY_ORDER.length ? CITY_ORDER : [cfg.focusCity].filter(Boolean));
 function placeLi(p, i, dist) {
   const addr = `${shortStreet(p.street)}, ${p.house}${p.old ? ` (кол. ${shortStreet(p.old)})` : ''}`;
   return `<li class="place${i === activeIdx ? ' active' : ''}" data-i="${i}" tabindex="0" role="button">
