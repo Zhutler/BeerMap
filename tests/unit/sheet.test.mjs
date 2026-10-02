@@ -60,3 +60,10 @@ test('нет обязательных колонок', () => {
   const { errors } = parseSheet('name,city\nA,Одеса\n');
   assert.match(errors[0].msg, /нет колонок: type, street, house/);
 });
+
+test('пустые строки с одним только active пропускаются; «так/ні» понимаются', () => {
+  const csv = HEAD + 'A,shop,Одеса,вулиця X,1,,,,,,,,так\nB,bar,Одеса,вулиця Y,2,,,,,,,,ні\n,,,,,,,,,,,,FALSE\n,,,,,,,,,,,,\n';
+  const { places, errors } = parseSheet(csv);
+  assert.deepEqual(errors, []);
+  assert.deepEqual(places.map(p => [p.name, p.active]), [['A', true], ['B', false]]);
+});

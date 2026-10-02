@@ -50,12 +50,28 @@ docs/demo/                 исходное демо «Нізащо Мила» �
 
 ## Новый клиент
 
-1. Создай папку `clients/<id>/` (латиница, например `loca-deserta`).
-2. Положи туда `client.json` (образец: `clients/nizashcho-myla/client.json`), `logo.jpg` и, если есть, иконку для «Що поруч».
-3. Заполни тексты, цвета, `marker.text`, `countries`, `sheetCsvUrl`, `cloudflareProject`.
-4. Закоммить в `main`. Проект Pages создастся сам при первой публикации.
+1. `npm run new-client -- <id> "<Название>" [--shape cap|hex|drop] [--text LD]`
+   создаёт `clients/<id>/client.json` и временное лого из инициалов. Клиент создаётся **черновиком**
+   (`"draft": true`): ежедневная сборка его пропускает.
+2. Таблица: сделать копию [шаблона](https://docs.google.com/spreadsheets/d/1IliEW_BbXnSjlHprIyM8SJnWIa6FVmYhnqt6nv9ATe0/edit)
+   (выпадающий список `type`, галочка `active`, вкладка «Інструкція»), доступ «Все, у кого есть ссылка: читатель»,
+   ссылку `https://docs.google.com/spreadsheets/d/<ID>/export?format=csv` вставить в `sheetCsvUrl`.
+3. Лого (`logo.jpg/png/svg`), цвета, `marker.text`, `marker.shape` в `client.json`; иконку «Що поруч» можно положить как `near.png`.
+4. Проверить локально: `node build/build.mjs <id>` (черновик можно собрать явно).
+5. Убрать `"draft": true` и закоммитить в `main`. Карта появится на `https://zhutler.github.io/BeerMap/<id>/`
+   (и на `https://<cloudflareProject>.pages.dev`).
 
-Шаблон копировать не нужно. Новые страны для маски: `npm run masks -- POL` (код ISO3), затем закоммитить `data/masks/POL.geojson`.
+Шаблон кода копировать не нужно. Формы маркера: `cap` (крышка), `hex` (сота), `drop` (капля).
+Новые страны для маски: `npm run masks -- POL` (код ISO3), затем закоммитить `data/masks/POL.geojson`.
+
+## Где опубликовано
+
+- **GitHub Pages** (основной адрес): `https://zhutler.github.io/BeerMap/<id>/`. Ветка `gh-pages`, каждый клиент в своей папке;
+  клиент, у которого сборка упала, остаётся в прошлой версии.
+- **Cloudflare Pages**: `https://<cloudflareProject>.pages.dev`. Некоторые украинские провайдеры (например, Vega)
+  блокируют `*.pages.dev`, поэтому основной адрес пока GitHub Pages; со своим доменом вернёмся на Cloudflare.
+- После публикации сборка сама открывает живой сайт и проверяет, что он отдаёт свежую страницу.
+- Расписание продлевается после каждого ночного запуска (GitHub отключает его после 60 дней без коммитов).
 
 ## Секреты (GitHub → Settings → Secrets and variables → Actions)
 

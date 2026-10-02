@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write   # чтобы закоммитить кеш координат
+  actions: write    # чтобы продлевать расписание (см. последний шаг)
 
 concurrency:
   group: build-deploy
@@ -103,3 +104,11 @@ jobs:
         run: |
           echo "::error::Есть клиенты с ошибками: смотри сводку выше (таблица «проверь эти строки») и шаг Playwright"
           exit 1
+
+      # GitHub отключает расписание в публичном репозитории после 60 дней без коммитов.
+      # Повторное включение workflow через API сбрасывает этот счётчик, коммиты не нужны.
+      - name: Продлить расписание
+        if: always() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/build-deploy.yml/enable" && echo "Расписание продлено"

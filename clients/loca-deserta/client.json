@@ -1,0 +1,57 @@
+{
+  "name": "Loca Deserta",
+  "sheetCsvUrl": "https://docs.google.com/spreadsheets/d/1jLWLh9hizyTO1xpQiyxV-J6WmY_bJn9fTRbx97szLe8/export?format=csv",
+  "cloudflareProject": "loca-deserta-map",
+  "githubPages": true,
+  "countries": [
+    "UKR"
+  ],
+  "texts": {
+    "title": "Де випити меду? · Loca Deserta Meadery",
+    "heading": "Де випити меду?",
+    "subheading": "Тут наливають і продають Loca Deserta",
+    "panelLabel": "Де купити медовуху Loca Deserta",
+    "logoAlt": "Loca Deserta Meadery"
+  },
+  "images": {
+    "logo": "logo.jpg",
+    "near": "near.png"
+  },
+  "font": {
+    "family": "Montserrat",
+    "googleWeights": [
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "fallback": "'Segoe UI', Roboto, Arial, sans-serif"
+  },
+  "colors": {
+    "cream": "#F6F1F3",
+    "paper": "#FFFBFC",
+    "navy": "#1A1418",
+    "navy2": "#4B3A44",
+    "orange": "#C9467F",
+    "gold": "#B85C86",
+    "line": "#EADCE3",
+    "muted": "#7A6B73"
+  },
+  "basemap": {
+    "background": "#F6F1F3",
+    "water": "#D6E3EA",
+    "park": "#E6E9DA",
+    "building": "#ECE4E7",
+    "label": "#4B3A44"
+  },
+  "marker": {
+    "shape": "hex",
+    "text": "МЕД",
+    "colors": {
+      "shop": "#1A1418",
+      "bar": "#C9467F"
+    }
+  },
+  "cityOrder": []
+}
