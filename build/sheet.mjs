@@ -21,7 +21,7 @@ export async function fetchCsv(url, { retries = 3 } = {}) {
       const text = await r.text();
       // Неопубликованная таблица отдаёт HTML-страницу входа вместо CSV
       if (/^\s*<!doctype html|^\s*<html/i.test(text)) {
-        throw new Error('вместо CSV пришёл HTML: таблица не опубликована как CSV или ссылка неверная');
+        throw new Error('вместо CSV пришёл HTML: таблица закрыта (нужен доступ «Все, у кого есть ссылка: читатель» или публикация в CSV) или ссылка неверная');
       }
       return text;
     } catch (e) {
