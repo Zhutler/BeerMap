@@ -15,7 +15,8 @@
   },
   "images": {
     "logo": "logo.jpg",
-    "near": "near.png"
+    "near": "near.png",
+    "me": "bee.png"
   },
   "font": {
     "family": "Montserrat",
@@ -46,7 +47,7 @@
     "label": "#4B3A44"
   },
   "marker": {
-    "shape": "hex",
+    "shape": "honey",
     "text": "МЕД",
     "colors": {
       "shop": "#1A1418",

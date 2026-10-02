@@ -15,7 +15,7 @@ const DEFAULTS = {
 const COLOR_KEYS = ['cream', 'paper', 'navy', 'navy2', 'orange', 'gold', 'line', 'muted'];
 const BASEMAP_KEYS = ['background', 'water', 'park', 'building', 'label'];
 const HEX = /^#[0-9a-f]{3,8}$/i;
-export const MARKER_SHAPES = ['cap', 'hex', 'drop'];
+export const MARKER_SHAPES = ['cap', 'hex', 'drop', 'honey'];
 
 export const listClients = ({ includeDrafts = false } = {}) => readdirSync(CLIENTS_DIR, { withFileTypes: true })
   .filter(d => d.isDirectory() && existsSync(join(CLIENTS_DIR, d.name, 'client.json')))
