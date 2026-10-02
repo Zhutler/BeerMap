@@ -190,6 +190,12 @@ const { cfg, cities, mask } = D;
 const PLACES = D.places; // {name,type,city,street,house,old,ig,gmaps,placeId,note,c:[lat,lng]}
 const TYPE_LABEL = cfg.typeLabels;
 const CITY_ORDER = cfg.cityOrder;
+// ?city=Львів у посиланні (QR на фестивалі): карта одразу відкривається на цьому місті
+const URL_CITY = (() => {
+  const q = (new URLSearchParams(location.search).get('city') || '').trim().toLowerCase();
+  return q ? [...new Set(D.places.map(p => p.city))].find(c => c.toLowerCase() === q) || null : null;
+})();
+const FOCUS_CITY = URL_CITY || cfg.focusCity;
 const C = cfg.colors;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[ch]));
@@ -361,9 +367,10 @@ const km = (a, b) => {
 const fmtKm = d => d < 1 ? `${Math.round(d * 1000 / 10) * 10} м` : d < 20 ? `${d.toFixed(1).replace('.', ',')} км` : `${Math.round(d)} км`;
 
 // розгорнуті міста: з cityOrder, а якщо порядок не задано, то головне місто (де найбільше точок)
-const openCities = new Set(CITY_ORDER.length ? CITY_ORDER : [cfg.focusCity].filter(Boolean));
+const openCities = new Set(URL_CITY ? [URL_CITY] : CITY_ORDER.length ? CITY_ORDER : [cfg.focusCity].filter(Boolean));
 function placeLi(p, i, dist) {
-  const addr = `${shortStreet(p.street)}, ${p.house}${p.old ? ` (кол. ${shortStreet(p.old)})` : ''}`;
+  // у режимі «найближчі» список змішує міста, тому показуємо й місто
+  const addr = `${dist != null ? `${p.city}, ` : ''}${shortStreet(p.street)}, ${p.house}${p.old ? ` (кол. ${shortStreet(p.old)})` : ''}`;
   return `<li class="place${i === activeIdx ? ' active' : ''}" data-i="${i}" tabindex="0" role="button">
     <span class="dot">${markerSvg(p.type, 26)}</span>
     <span><b>${esc(p.name)}</b><small>${esc(addr)}</small></span>
@@ -382,7 +389,7 @@ function renderList() {
     return;
   }
   const groups = {}; vis.forEach(x => (groups[x.p.city] ??= []).push(x));
-  const rank = c => { const i = CITY_ORDER.indexOf(c); return i < 0 ? 99 : i; };
+  const rank = c => { if (c === URL_CITY) return -1; const i = CITY_ORDER.indexOf(c); return i < 0 ? 99 : i; };
   const cityNames = Object.keys(groups).sort((a, b) => rank(a) - rank(b) || groups[b].length - groups[a].length || a.localeCompare(b, 'uk'));
   el.innerHTML = cityNames.map(c => {
     const open = query ? true : openCities.has(c);
@@ -457,7 +464,7 @@ function locateMe() {
   }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
 }
 nearBtn.onclick = locateMe; fab.onclick = locateMe;
-const NEAR_KM = 30; // якщо найближчий заклад далі, просто показуємо користувача, а відстань пишемо в підказці
+const NEAR_KM = 30; // ближче за це в кадр беремо ще й сусідні заклади; далі тільки людину і найближчий
 function setMe(ll, acc = 0) {
   me = ll;
   if (meMarker) map.removeLayer(meMarker);
@@ -471,8 +478,9 @@ function setMe(ll, acc = 0) {
   const n = sorted[0];
   // У кадрі: користувач і найближчий заклад, плюс сусідні, тільки якщо вони майже так само близько.
   // Інакше (раніше) у кадр потрапляли заклади з інших міст і камера відлітала на всю Україну.
-  if (n && n.d <= NEAR_KM) {
-    const lim = Math.max(n.d * 1.5, n.d + 1);
+  // Далекий найближчий (інше місто): у кадрі людина і цей заклад, щоб було видно, куди їхати.
+  if (n) {
+    const lim = n.d <= NEAR_KM ? Math.max(n.d * 1.5, n.d + 1) : n.d;
     const pts = sorted.filter(x => x.d <= lim).slice(0, 3).map(x => x.p.c);
     map.flyToBounds([me, ...pts], { ...pad(70), maxZoom: 16, duration: .8 });
   } else {
@@ -505,7 +513,7 @@ applyFilterToMarkers();
 // без анімації: інакше її кінець обриває переліт до міста нижче (на телефоні карта лишалась на зумі 6)
 if (PLACES.length) map.fitBounds(L.latLngBounds(PLACES.map(p => p.c)), { ...pad(40), animate: false });
 // одразу показуємо місто, де найбільше точок (або focusCity з конфігу)
-const focus = PLACES.filter(p => p.city === cfg.focusCity).map(p => p.c);
+const focus = PLACES.filter(p => p.city === FOCUS_CITY).map(p => p.c);
 if (focus.length) introTimer = setTimeout(() => { introTimer = null; map.flyToBounds(focus, { ...pad(50), duration: 1.2 }); }, 600);
 
 // для автотестів
