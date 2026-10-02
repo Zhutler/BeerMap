@@ -1,0 +1,100 @@
+name: Сборка и публикация карт
+
+on:
+  schedule:
+    - cron: '17 3 * * *'   # каждый день в 03:17 UTC (06:17 по Киеву летом, 05:17 зимой)
+  workflow_dispatch:
+    inputs:
+      client:
+        description: 'Клиент (папка в clients/). Пусто = все'
+        required: false
+        default: ''
+  push:
+    branches: [main]
+    paths: ['clients/**', 'template/**', 'build/**', 'data/cities.json', 'data/masks/**', 'package.json', 'package-lock.json', '.github/workflows/build-deploy.yml']
+
+permissions:
+  contents: write   # чтобы закоммитить кеш координат
+
+concurrency:
+  group: build-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Unit-тесты
+        run: npm test
+
+      - name: Сборка (таблица → геокодинг → страницы)
+        id: build
+        env:
+          VISICOM_API_KEY: ${{ secrets.VISICOM_API_KEY }}
+          MAPTILER_API_KEY: ${{ secrets.MAPTILER_API_KEY }}
+          NOMINATIM_USER_AGENT: ${{ vars.NOMINATIM_USER_AGENT }}
+          CLIENT: ${{ github.event.inputs.client }}
+        run: node build/build.mjs $CLIENT || echo "failed=1" >> "$GITHUB_OUTPUT"
+
+      - name: Сохранить кеш координат в репозиторий
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain data/)" ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add data/geocache.json data/cities.json
+            git commit -m "Кеш геокодинга: $(date -u +%F)"
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
+          else
+            echo "Кеш не изменился"
+          fi
+
+      - name: Браузер для Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Playwright по каждому собранному клиенту
+        id: e2e
+        run: |
+          passed=""
+          for id in $(node -p "require('./dist/build-result.json').ok.join(' ')"); do
+            if CLIENTS=$id PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report/$id npx playwright test; then
+              passed="$passed $id"
+            else
+              echo "failed=1" >> "$GITHUB_OUTPUT"
+            fi
+          done
+          echo "passed=$passed" >> "$GITHUB_OUTPUT"
+
+      - name: Публикация на Cloudflare Pages
+        if: steps.e2e.outputs.passed != ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node build/deploy.mjs ${{ steps.e2e.outputs.passed }}
+
+      - name: Скриншоты и отчёты
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-and-reports
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Итог
+        if: steps.build.outputs.failed == '1' || steps.e2e.outputs.failed == '1'
+        run: |
+          echo "::error::Есть клиенты с ошибками: смотри сводку выше (таблица «проверь эти строки») и шаг Playwright"
+          exit 1

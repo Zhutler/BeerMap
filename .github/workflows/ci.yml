@@ -1,0 +1,31 @@
+name: Проверки
+
+# Без сети и без публикации: unit-тесты и Playwright на тестовой таблице с примерными координатами.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Офлайн-сборка из фикстуры
+        run: node build/build.mjs nizashcho-myla --offline --csv tests/fixtures/nizashcho-myla.csv --cache tests/fixtures/geocache.json --cities tests/fixtures/cities.json
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7

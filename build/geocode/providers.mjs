@@ -8,7 +8,7 @@ export const iso2 = iso3 => ISO2[iso3] ?? iso3.slice(0, 2).toLowerCase();
 const TIMEOUT = 15000;
 async function getJson(url, headers = {}) {
   const r = await fetch(url, { headers, signal: AbortSignal.timeout(TIMEOUT) });
-  if (r.status === 401 || r.status === 403) throw new Error(`HTTP ${r.status}: проверь ключ`);
+  if (r.status === 401 || r.status === 403) throw new Error(`HTTP ${r.status}: доступ запрещён (неверный ключ или блокировка)`);
   if (r.status === 429) throw new Error('HTTP 429: превышен лимит запросов');
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
