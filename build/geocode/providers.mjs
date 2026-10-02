@@ -129,7 +129,7 @@ export function nominatim({ minIntervalMs = 1100, userAgent = USER_AGENT } = {})
       const json = await call({ countrycodes: iso2(country), city: name, limit: '5' });
       return (json || [])
         .filter(x => ['city', 'town', 'village', 'municipality', 'hamlet', 'suburb'].includes(x.addresstype))
-        .map(x => ({ name: x.name, label: x.display_name, bbox: [x.boundingbox[0], x.boundingbox[2], x.boundingbox[1], x.boundingbox[3]].map(Number) }));
+        .map(x => ({ name: x.name, type: x.addresstype, label: x.display_name, bbox: [x.boundingbox[0], x.boundingbox[2], x.boundingbox[1], x.boundingbox[3]].map(Number) }));
     },
   };
 }

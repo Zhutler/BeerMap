@@ -14,7 +14,9 @@ export async function resolveCities(places, { cities, country, providers, offlin
     if (cities[city]) continue;
     if (offline || !nom) { failures.push({ city, msg: 'нет bbox в data/cities.json' }); continue; }
     try {
-      const found = (await nom.city(city, country)).filter(c => c.name?.toLowerCase() === city.toLowerCase());
+      let found = (await nom.city(city, country)).filter(c => c.name?.toLowerCase() === city.toLowerCase());
+      // несколько совпадений, но город среди них один (остальное сёла/районы): берём город
+      if (found.length > 1 && found.filter(c => c.type === 'city').length === 1) found = found.filter(c => c.type === 'city');
       if (found.length === 1) {
         const b = found[0].bbox;
         const m = 0.01; // ~1 км запаса
