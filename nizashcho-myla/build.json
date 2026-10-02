@@ -1,0 +1,14 @@
+{
+  "client": "nizashcho-myla",
+  "places": 17,
+  "cities": [
+    "Одеса",
+    "Луцьк"
+  ],
+  "vendor": {
+    "leaflet": "1.9.4",
+    "leaflet.markercluster": "1.5.3",
+    "maplibre-gl": "4.7.1",
+    "maplibre-gl-leaflet": "0.1.4"
+  }
+}
