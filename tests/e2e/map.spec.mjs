@@ -89,6 +89,15 @@ for (const id of clients) {
       expect(await link.getAttribute('href')).toMatch(/^https:\/\/(www\.google\.com\/maps|maps\.app\.goo\.gl|goo\.gl\/maps)/);
     });
 
+    for (const delay of [0, 900]) test(`тап через ${delay} мс после загрузки не перебивается стартовым облётом`, async ({ page, isMobile }) => {
+      await page.waitForTimeout(delay); // 900 мс: прямо во время облёта
+      if (isMobile) await page.evaluate(() => { document.getElementById('panel').dataset.open = 'true'; });
+      await page.locator('#list .place').first().click();
+      await page.waitForTimeout(2500); // стартовый облёт начался бы через 0,6 с
+      await expect(page.locator('.leaflet-popup .go')).toBeVisible();
+      expect(await page.evaluate(() => __beermap.map.getZoom())).toBeGreaterThanOrEqual(15);
+    });
+
     test('поиск фильтрует список и маркеры', async ({ page, isMobile }) => {
       const name = await page.evaluate(() => __beermap.places[0].name);
       if (isMobile) await page.locator('#handle').click();

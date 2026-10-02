@@ -91,6 +91,10 @@ map.fitBounds(COUNTRY_BOUNDS, { ...pad(10), animate: false });
 
 /* ---------- state ---------- */
 let filter = 'all', query = '', me = null, meMarker = null, activeIdx = null;
+// Стартовий переліт до міста скасовується будь-якою дією користувача, інакше він перебиває його переліт
+let introTimer = null;
+const cancelIntro = () => { if (introTimer) { clearTimeout(introTimer); introTimer = null; } };
+['pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, cancelIntro, { capture: true, passive: true }));
 const statusEl = document.getElementById('status');
 const toastEl = document.getElementById('toast'); let toastT;
 function say(msg, ms = 6000) {
@@ -264,7 +268,7 @@ applyFilterToMarkers();
 if (PLACES.length) map.fitBounds(L.latLngBounds(PLACES.map(p => p.c)), { ...pad(40), animate: false });
 // одразу показуємо місто, де найбільше точок (або focusCity з конфігу)
 const focus = PLACES.filter(p => p.city === cfg.focusCity).map(p => p.c);
-if (focus.length) setTimeout(() => map.flyToBounds(focus, { ...pad(50), duration: 1.2 }), 600);
+if (focus.length) introTimer = setTimeout(() => { introTimer = null; map.flyToBounds(focus, { ...pad(50), duration: 1.2 }); }, 600);
 
 // для автотестів
 window.__beermap = { map, cluster, markers, places: PLACES, cities, pad };
