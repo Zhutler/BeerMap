@@ -450,16 +450,15 @@ function locateMe() {
   nearBtn.setAttribute('aria-busy', 'true'); fab.setAttribute('aria-busy', 'true'); say('Шукаємо вас…', 15000);
   navigator.geolocation.getCurrentPosition(pos => {
     nearBtn.removeAttribute('aria-busy'); fab.removeAttribute('aria-busy');
-    const acc = pos.coords.accuracy || 0;
-    setMe([pos.coords.latitude, pos.coords.longitude]);
-    say(acc > 800 ? `Місце визначено приблизно (точність ~${fmtKm(acc / 1000)}).` : '');
+    setMe([pos.coords.latitude, pos.coords.longitude], pos.coords.accuracy || 0);
   }, err => {
     nearBtn.removeAttribute('aria-busy'); fab.removeAttribute('aria-busy');
     say((err.code === 1 ? 'Доступ до геолокації заборонено.' : 'Не вдалося визначити місцезнаходження.') + ' Перевірте дозвіл на геолокацію в браузері.', 7000);
   }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
 }
 nearBtn.onclick = locateMe; fab.onclick = locateMe;
-function setMe(ll) {
+const NEAR_KM = 30; // якщо найближчий заклад далі, просто показуємо користувача, а відстань пишемо в підказці
+function setMe(ll, acc = 0) {
   me = ll;
   if (meMarker) map.removeLayer(meMarker);
   // «Ви тут»: своя картинка клієнта (images.me, напр. бджілка) або кругла іконка «Що поруч»
@@ -468,10 +467,21 @@ function setMe(ll) {
     : L.divIcon({ className: '', html: `<div class="me"><img src="${esc(cfg.nearIcon)}" alt="Ви тут"></div>`, iconSize: [30, 30], iconAnchor: [15, 15] });
   meMarker = L.marker(me, { zIndexOffset: 1000, icon: meIcon })
     .addTo(map).bindTooltip('Ви тут', { direction: 'top', offset: [0, -14] });
-  const near = PLACES.filter(matches).map(p => ({ p, d: km(me, p.c) })).sort((a, b) => a.d - b.d).slice(0, 3);
-  map.flyToBounds([me, ...near.map(x => x.p.c)], { ...pad(70), maxZoom: 15, duration: .8 });
+  const sorted = PLACES.filter(matches).map(p => ({ p, d: km(me, p.c) })).sort((a, b) => a.d - b.d);
+  const n = sorted[0];
+  // У кадрі: користувач і найближчий заклад, плюс сусідні, тільки якщо вони майже так само близько.
+  // Інакше (раніше) у кадр потрапляли заклади з інших міст і камера відлітала на всю Україну.
+  if (n && n.d <= NEAR_KM) {
+    const lim = Math.max(n.d * 1.5, n.d + 1);
+    const pts = sorted.filter(x => x.d <= lim).slice(0, 3).map(x => x.p.c);
+    map.flyToBounds([me, ...pts], { ...pad(70), maxZoom: 16, duration: .8 });
+  } else {
+    map.flyTo(me, Math.max(map.getZoom(), 13), { duration: .8 });
+  }
   renderList();
-  if (isMobile()) { const n = near[0]; if (n) say(`Найближче: ${n.p.name}, ${fmtKm(n.d)}. Потягніть список угору, щоб побачити всі.`, 5000); }
+  const accText = acc > 800 ? ` Місце визначено приблизно (±${fmtKm(acc / 1000)}).` : '';
+  if (n) say(`Найближче: ${n.p.name}, ${fmtKm(n.d)}.${isMobile() ? ' Потягніть список угору, щоб побачити всі.' : ''}${accText}`, 7000);
+  else say(`Поруч нічого не знайшли.${accText}`, 7000);
 }
 
 const handle = document.getElementById('handle');
