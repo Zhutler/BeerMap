@@ -1,1 +1,52 @@
-{}
+{
+ "loca-deserta|beerfreak bar|львів|вулиця фурманська|7": {
+  "placeId": "ChIJCTmiQQzdOkcRI-SbqLTo-2s",
+  "googleName": "BEERFREAK",
+  "address": "вулиця Фурманська, 7, Львів, Львівська область, 79000",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|drunken duck|львів|вулиця братів рогатинців|45": {
+  "placeId": "ChIJuQD4bmzdOkcRGvNvfX_fajw",
+  "googleName": "П'яна качка / Drunken Duck",
+  "address": "вулиця Братів Рогатинців, 45, Львів, Львівська область, 79000",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|hoppy hog|одеса|вулиця святослава караванського|38": {
+  "notFound": true,
+  "reason": "«У Хмільного кабана»: другое название",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|punkraft|київ|вулиця ігорівська|14а": {
+  "placeId": "ChIJl4696EbO1EAReEJTvMPF4NE",
+  "googleName": "Punkraft",
+  "address": "вулиця Ігорівська, 14, Київ, 04070",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|vasco craft beer|харків|вулиця університетська|29": {
+  "notFound": true,
+  "reason": "«Vasco Craft Beer»: 1273 м от нашей точки",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|гонір|івано-франківськ|вулиця деповська|15": {
+  "placeId": "ChIJTWs2zBbBMEcRoYG1prH9lCc",
+  "googleName": "Броварня ГОНІР",
+  "address": "вулиця Деповська, 15, Івано-Франківськ, Івано-Франківська область, 76000",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|лук ім. св. христофора|львів|вулиця івана франка|3": {
+  "placeId": "ChIJCa3YGG3dOkcRwQFsfB69T5s",
+  "googleName": "Львівський Університет Крафтового Пива імені св. Христофора",
+  "address": "вулиця Івана Франка, 3, Львів, Львівська область, 79000",
+  "at": "2026-10-02"
+ },
+ "nizashcho-myla|budupivo|одеса|вулиця болгарська|87а": {
+  "notFound": true,
+  "reason": "«Буду Пиво»: 1396 м от нашей точки",
+  "at": "2026-10-02"
+ },
+ "nizashcho-myla|dreambeer|одеса|вулиця степова|34": {
+  "notFound": true,
+  "reason": "«Hop Hey»: другое название",
+  "at": "2026-10-02"
+ }
+}
