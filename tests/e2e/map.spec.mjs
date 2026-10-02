@@ -87,6 +87,11 @@ for (const id of clients) {
       const link = page.locator('.leaflet-popup .go');
       await expect(link).toBeVisible({ timeout: 5000 });
       expect(await link.getAttribute('href')).toMatch(/^https:\/\/(www\.google\.com\/maps|maps\.app\.goo\.gl|goo\.gl\/maps)/);
+      // ведёт на карточку заведения: своя ссылка, place_id или поиск по названию (а не голый адрес)
+      const href = await link.getAttribute('href');
+      const p0 = await page.evaluate(() => { const li = document.querySelector('#list .place.active'); return __beermap.places[+li.dataset.i]; });
+      if (!p0.gmaps) expect(href).toContain(encodeURIComponent(p0.name));
+      if (p0.placeId) expect(href).toContain(p0.placeId);
     });
 
     for (const delay of [0, 900]) test(`тап через ${delay} мс после загрузки не перебивается стартовым облётом`, async ({ page, isMobile }) => {
@@ -135,12 +140,12 @@ for (const id of clients) {
       await page.goto(`/${id}/`);
       await page.waitForFunction(() => window.__beermap);
       await page.locator('#map').tap({ position: { x: 200, y: 300 } });
-      expect(await page.locator('.me').count()).toBe(0);
+      expect(await page.locator('.me, .me-pic').count()).toBe(0);
       const p = await page.evaluate(() => __beermap.places[0].c);
       await context.grantPermissions(['geolocation']);
       await context.setGeolocation({ latitude: p[0] + 0.001, longitude: p[1] + 0.001 });
       await page.locator('#fab').click();
-      await expect(page.locator('.me')).toHaveCount(1);
+      await expect(page.locator('.me, .me-pic')).toHaveCount(1);
       await expect(page.locator('#list .km').first()).toBeVisible({ timeout: 5000 }).catch(() => {});
       expect(await page.locator('#list .km').count()).toBeGreaterThan(0);
     });

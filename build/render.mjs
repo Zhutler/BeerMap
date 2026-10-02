@@ -72,7 +72,7 @@ export function renderClient({ client: c, places, cities, mask, outDir }) {
   const data = {
     cfg: {
       typeLabels: c.typeLabels, cityOrder: c.cityOrder, focusCity, colors: c.colors, basemap: c.basemap,
-      marker: c.marker, fontFamily: c.font.family, nearIcon: c.images.near || NEAR_FALLBACK,
+      marker: c.marker, fontFamily: c.font.family, nearIcon: c.images.near || NEAR_FALLBACK, meIcon: c.images.me || '',
     },
     cities: Object.fromEntries(usedCities.map(n => [n, cities[n].bbox])),
     mask,

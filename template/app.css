@@ -58,6 +58,7 @@ button,input{font:inherit;color:inherit}
 .cap.big{transform:scale(1.25)}
 .me{width:30px;height:30px;border-radius:50%;border:2px solid var(--orange);background:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--orange) 25%,transparent)}
 .me img{width:100%;height:100%;border-radius:50%}
+.me-pic{width:44px;height:48px;object-fit:contain;filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 3px 2px rgba(0,0,0,.3))}
 .cluster{width:46px;height:46px;border-radius:50%;background:var(--navy);color:var(--cream);display:grid;place-items:center;font-weight:900;font-size:16px;border:3px solid var(--gold)}
 
 /* ---------- popup ---------- */

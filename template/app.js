@@ -66,9 +66,22 @@ const SHAPES = {
     return { outer: 'M19 1.5C19 1.5 5.5 15.5 5.5 23.5a13.5 13.5 0 0 0 27 0C32.5 15.5 19 1.5 19 1.5Z', cx: 19, cy: 23.5, r: 9.5 };
   },
 };
+// Медова сота: глянцева шестикутна комірка; колір обідка = тип закладу (магазин / бар)
+function honeySvg(ring, st) {
+  const hex = r => { let d = ''; for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i - Math.PI / 2; d += (i ? 'L' : 'M') + (19 + r * Math.cos(a)).toFixed(2) + ' ' + (19 + r * Math.sin(a)).toFixed(2); } return d + 'Z'; };
+  return `<svg class="cap"${st} viewBox="0 0 38 38">
+    <defs><linearGradient id="honey-g" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#FFC21A"/><stop offset=".55" stop-color="#F7A400"/><stop offset="1" stop-color="#EE8A00"/></linearGradient></defs>
+    <path d="${hex(18.2)}" fill="${ring}" stroke-linejoin="round"/>
+    <path d="${hex(14.6)}" fill="url(#honey-g)" stroke="#E36A00" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M10.2 17.5c1.4-4.2 4.6-7 8.8-8.1" fill="none" stroke="#FFE08A" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>
+    <ellipse cx="14.6" cy="13.8" rx="2.6" ry="1.5" transform="rotate(-35 14.6 13.8)" fill="#fff"/>
+    <ellipse cx="12.4" cy="18.2" rx="1" ry=".7" fill="#fff"/>
+    <ellipse cx="25.6" cy="23.6" rx="1.4" ry=".8" transform="rotate(-35 25.6 23.6)" fill="#fff" opacity=".9"/></svg>`;
+}
 function markerSvg(type, size) {
   const M = cfg.marker, fill = M.colors[type] || C.navy;
   const st = size ? ` style="width:${size}px;height:${size}px"` : '';
+  if (M.shape === 'honey') return honeySvg(fill, st);
   const g = (SHAPES[M.shape] || SHAPES.cap)();
   const fs = (M.text || '').length > 2 ? 8.5 : 10.5;
   return `<svg class="cap"${st} viewBox="0 0 38 38"><path d="${g.outer}" fill="${fill}" stroke="${C.gold}" stroke-width="1.6" stroke-linejoin="round"/>
@@ -122,12 +135,13 @@ function say(msg, ms = 6000) {
 const shortStreet = s => (s || '').replace(/^вулиця\s+/i, '');
 const markers = [];
 function routeUrl(p) {
-  // Маршрут: якщо знаємо картку закладу в Google (placeId), ведемо точно до неї.
-  // Якщо ні, ведемо на адресу (без назви, щоб Google не підсунув чужий магазин).
+  // Маршрут веде на картку закладу в Google:
+  // 1) gmaps_url з таблиці; 2) place_id: маршрут точно до картки;
+  // 3) інакше пошук «назва + повна адреса»: Google відкриває картку закладу, а повна адреса не дає підсунути чужий.
   const addrText = `${p.street}, ${p.house}, ${p.city}`;
   if (p.gmaps) return p.gmaps;
   if (p.placeId) return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.name + ', ' + addrText)}&destination_place_id=${encodeURIComponent(p.placeId)}`;
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addrText)}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ', ' + addrText)}`;
 }
 function popupHtml(p) {
   const addr = `${p.street.replace(/^вулиця /i, 'вул. ')}, ${p.house}`;
@@ -263,7 +277,11 @@ nearBtn.onclick = locateMe; fab.onclick = locateMe;
 function setMe(ll) {
   me = ll;
   if (meMarker) map.removeLayer(meMarker);
-  meMarker = L.marker(me, { zIndexOffset: 1000, icon: L.divIcon({ className: '', html: `<div class="me"><img src="${esc(cfg.nearIcon)}" alt="Ви тут"></div>`, iconSize: [30, 30], iconAnchor: [15, 15] }) })
+  // «Ви тут»: своя картинка клієнта (images.me, напр. бджілка) або кругла іконка «Що поруч»
+  const meIcon = cfg.meIcon
+    ? L.divIcon({ className: '', html: `<img class="me-pic" src="${esc(cfg.meIcon)}" alt="Ви тут">`, iconSize: [44, 48], iconAnchor: [22, 24] })
+    : L.divIcon({ className: '', html: `<div class="me"><img src="${esc(cfg.nearIcon)}" alt="Ви тут"></div>`, iconSize: [30, 30], iconAnchor: [15, 15] });
+  meMarker = L.marker(me, { zIndexOffset: 1000, icon: meIcon })
     .addTo(map).bindTooltip('Ви тут', { direction: 'top', offset: [0, -14] });
   const near = PLACES.filter(matches).map(p => ({ p, d: km(me, p.c) })).sort((a, b) => a.d - b.d).slice(0, 3);
   map.flyToBounds([me, ...near.map(x => x.p.c)], { ...pad(70), maxZoom: 15, duration: .8 });
