@@ -13,6 +13,23 @@ for (const v of ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID']) {
   if (!process.env[v]) { console.error(`Нет секрета ${v}: публикация пропущена`); process.exit(1); }
 }
 
+// Проверка живого сайта после публикации: HTTPS, код 200, наша страница. До ~3 минут (сертификат и кеш)
+async function smoke(url, title) {
+  let last = '';
+  for (let i = 0; i < 12; i++) {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      const html = await r.text();
+      if (r.ok && html.includes('id="map-data"')) return `ок (HTTP ${r.status}, «${title}»)`;
+      last = `HTTP ${r.status}, не наша страница`;
+    } catch (e) {
+      last = [e.message, e.cause?.code, e.cause?.message].filter(Boolean).join(' / ');
+    }
+    await new Promise(res => setTimeout(res, 15000));
+  }
+  throw new Error(last);
+}
+
 const wrangler = (...args) => spawnSync('npx', ['--yes', WRANGLER, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
 let failed = 0;
@@ -30,6 +47,8 @@ for (const id of ids) {
   const r = wrangler('pages', 'deploy', dir, '--project-name', project, '--branch', 'main', '--commit-dirty=true');
   process.stdout.write(r.stdout);
   if (r.status !== 0) { console.error(`✗ ${id}: ${r.stderr}`); failed++; continue; }
-  console.log(`✓ ${id} → https://${project}.pages.dev`);
+  const url = `https://${project}.pages.dev/`;
+  try { console.log(`✓ ${id} → ${url}: ${await smoke(url, c.texts.title)}`); }
+  catch (e) { console.error(`✗ ${id}: опубликовано, но ${url} не открывается: ${e.message}`); failed++; }
 }
 process.exit(failed ? 1 : 0);
