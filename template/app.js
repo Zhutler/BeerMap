@@ -197,13 +197,22 @@ function setActive(i, fly) {
   const p = PLACES[i], m = markers[i];
   if (fly && m) {
     if (isMobile()) panel.dataset.open = 'false';
-    cluster.zoomToShowLayer(m, () => {
-      const z = Math.max(map.getZoom(), 16);
-      // на телефоні зсуваємо центр, щоб точка й попап були над шторкою
-      const c = isMobile() ? map.unproject(map.project(p.c, z).subtract([0, 90 - PEEK / 2]), z) : p.c;
-      map.flyTo(c, z, { duration: .6 }); setTimeout(() => m.openPopup(), 650);
-    });
+    // Зум 16 більший за disableClusteringAtZoom (15): після перельоту маркер точно окремий.
+    const z = Math.max(map.getZoom(), 16);
+    // на телефоні зсуваємо центр, щоб точка й попап були над шторкою
+    const c = isMobile() ? map.unproject(map.project(p.c, z).subtract([0, 90 - PEEK / 2]), z) : p.c;
+    const token = ++flyToken;
+    map.once('moveend', () => openWhenShown(m, token, Date.now()));
+    map.flyTo(c, z, { duration: .6 });
   }
+}
+// Кластер додає маркер на карту трохи після moveend (власна анімація). Чекаємо, поки з'явиться іконка.
+let flyToken = 0;
+function openWhenShown(m, token, t0) {
+  if (token !== flyToken) return; // користувач уже вибрав інше
+  if (m._icon) { m.openPopup(); return; }
+  if (Date.now() - t0 > 3000) { cluster.zoomToShowLayer(m, () => m.openPopup()); return; }
+  requestAnimationFrame(() => openWhenShown(m, token, t0));
 }
 
 /* ---------- controls ---------- */
