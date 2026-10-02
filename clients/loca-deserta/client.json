@@ -1,6 +1,5 @@
 {
   "name": "Loca Deserta",
-  "draft": true,
   "sheetCsvUrl": "https://docs.google.com/spreadsheets/d/1jLWLh9hizyTO1xpQiyxV-J6WmY_bJn9fTRbx97szLe8/export?format=csv",
   "cloudflareProject": "loca-deserta-map",
   "githubPages": true,
