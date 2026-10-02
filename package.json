@@ -9,7 +9,7 @@
     "build": "node build/build.mjs",
     "build:offline": "node build/build.mjs --offline",
     "masks": "node build/update-masks.mjs",
-    "test": "node --test tests/unit/",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
     "test:e2e": "playwright test",
     "serve": "node tests/serve.mjs"
   },
