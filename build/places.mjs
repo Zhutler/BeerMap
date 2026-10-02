@@ -35,18 +35,19 @@ export function distanceM(a, b) {
 }
 
 /** Выбор карточки из ответа Places: название совпадает и рядом с нашей точкой. */
+export const placeUrl = id => `https://www.google.com/maps/place/?q=place_id:${id}`;
+
 export function pickPlace(places, { name, near }) {
-  const reasons = [];
+  const reasons = [], candidates = [];
   for (const pl of places || []) {
     const dn = pl.displayName?.text || '';
+    const d = near && pl.location ? Math.round(distanceM(near, [pl.location.latitude, pl.location.longitude])) : null;
+    candidates.push({ id: pl.id, name: dn, address: pl.formattedAddress || '', distanceM: d });
     if (!placeNameMatches(dn, name)) { reasons.push(`«${dn}»: другое название`); continue; }
-    if (near && pl.location) {
-      const d = distanceM(near, [pl.location.latitude, pl.location.longitude]);
-      if (d > MAX_DISTANCE_M) { reasons.push(`«${dn}»: ${Math.round(d)} м от нашей точки`); continue; }
-    }
+    if (d != null && d > MAX_DISTANCE_M) { reasons.push(`«${dn}»: ${d} м от нашей точки`); continue; }
     return { id: pl.id, name: dn, address: pl.formattedAddress || '' };
   }
-  return { reasons };
+  return { reasons, candidates: candidates.slice(0, 3) };
 }
 
 /* ---------- Places API (New): Text Search ---------- */
@@ -125,7 +126,7 @@ export async function fillPlaceIds({ client, places, located, cities, cache, env
     const k = ck(p), hit = cache[k];
     if (hit?.placeId) { p.placeId = hit.placeId; res.found.push({ p, ...hit, fromCache: true }); continue; }
     if (!apiKey) continue;
-    if (hit?.notFound && (Date.now() - Date.parse(hit.at)) / 864e5 < NOT_FOUND_RETRY_DAYS) { res.notFound.push({ p, reasons: [hit.reason] }); continue; }
+    if (hit?.notFound && (Date.now() - Date.parse(hit.at)) / 864e5 < NOT_FOUND_RETRY_DAYS) { res.notFound.push({ p, reasons: [hit.reason], candidates: hit.candidates || [] }); continue; }
     const loc = located.get(p);
     try {
       const list = await searchText(apiKey, { query: `${p.name}, ${p.street} ${p.house}, ${p.city}`, bbox: cities[p.city].bbox });
@@ -137,8 +138,8 @@ export async function fillPlaceIds({ client, places, located, cities, cache, env
         log(`  ✓ карточка: ${p.name} → «${pick.name}», ${pick.address}`);
       } else {
         const reason = pick.reasons.length ? pick.reasons.slice(0, 2).join('; ') : 'ничего не найдено';
-        cache[k] = { notFound: true, reason, at: today };
-        res.notFound.push({ p, reasons: [reason] });
+        cache[k] = { notFound: true, reason, candidates: pick.candidates, at: today };
+        res.notFound.push({ p, reasons: [reason], candidates: pick.candidates });
         log(`  ✗ карточка: ${p.name}: ${reason}`);
       }
     } catch (e) { res.errors.push(`${p.name}: ${e.message}`); }

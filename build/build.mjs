@@ -15,7 +15,7 @@ import { resolveCities, locateAll, failureReport } from './geocode/chain.mjs';
 import { cacheKey } from './geocode/match.mjs';
 import { buildMask } from './mask.mjs';
 import { renderClient, toClientPlace } from './render.mjs';
-import { fillPlaceIds } from './places.mjs';
+import { fillPlaceIds, placeUrl } from './places.mjs';
 import { existsSync } from 'node:fs';
 
 const args = process.argv.slice(2);
@@ -78,7 +78,8 @@ for (const id of ids) {
     save();
     if (pr.notFound.length || pr.errors.length) {
       const md = [`### ⚠️ ${id}: карточки Google`, '',
-        ...pr.notFound.map(x => `- строка ${x.p.row}, ${x.p.name}: карточка не найдена (${x.reasons.join('; ')}). Кнопка маршрута откроет поиск «название + адрес»; можно вписать gmaps_url вручную.`),
+        ...pr.notFound.map(x => `- строка ${x.p.row}, ${x.p.name}: карточка не принята (${x.reasons.join('; ')}). Кнопка маршрута откроет поиск «название + адрес». ` +
+          (x.candidates?.length ? `Кандидаты: ${x.candidates.map(c => `[${c.name}${c.distanceM != null ? `, ${c.distanceM} м` : ''}](${placeUrl(c.id)}) \`${c.id}\``).join(', ')}. Если это оно, впиши id в колонку place_id.` : 'Можно вписать gmaps_url вручную.')),
         ...pr.errors.map(e => `- ошибка: ${e}`)].join('\n');
       console.warn(md); summary(md);
     }
