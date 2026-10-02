@@ -11,10 +11,36 @@
   "address": "вулиця Братів Рогатинців, 45, Львів, Львівська область, 79000",
   "at": "2026-10-02"
  },
+ "loca-deserta|hoppy hog|одеса|вулиця святослава караванського|38": {
+  "notFound": true,
+  "reason": "«У Хмільного кабана»: другое название",
+  "candidates": [
+   {
+    "id": "ChIJBTaYN4kxxkARg-YcuPqb74E",
+    "name": "У Хмільного кабана",
+    "address": "вулиця Святослава Караванського, 38, Одеса, Одеська область, 65014",
+    "distanceM": 60
+   }
+  ],
+  "at": "2026-10-02"
+ },
  "loca-deserta|punkraft|київ|вулиця ігорівська|14а": {
   "placeId": "ChIJl4696EbO1EAReEJTvMPF4NE",
   "googleName": "Punkraft",
   "address": "вулиця Ігорівська, 14, Київ, 04070",
+  "at": "2026-10-02"
+ },
+ "loca-deserta|vasco craft beer|харків|вулиця університетська|29": {
+  "notFound": true,
+  "reason": "«Vasco Craft Beer»: 1273 м от нашей точки",
+  "candidates": [
+   {
+    "id": "ChIJLXmp5AChJ0ERl9uLJtnoKRA",
+    "name": "Vasco Craft Beer",
+    "address": "вулиця Сумська, 25, Харків, Харківська область, 61057",
+    "distanceM": 1273
+   }
+  ],
   "at": "2026-10-02"
  },
  "loca-deserta|гонір|івано-франківськ|вулиця деповська|15": {
@@ -27,6 +53,32 @@
   "placeId": "ChIJCa3YGG3dOkcRwQFsfB69T5s",
   "googleName": "Львівський Університет Крафтового Пива імені св. Христофора",
   "address": "вулиця Івана Франка, 3, Львів, Львівська область, 79000",
+  "at": "2026-10-02"
+ },
+ "nizashcho-myla|budupivo|одеса|вулиця болгарська|87а": {
+  "notFound": true,
+  "reason": "«Буду Пиво»: 1396 м от нашей точки",
+  "candidates": [
+   {
+    "id": "ChIJ_RHfgdgxxkARzUqSdI4g7Nw",
+    "name": "Буду Пиво",
+    "address": "вулиця Олександра Свіща, 38, Одеса, Одеська область, 65091",
+    "distanceM": 1396
+   }
+  ],
+  "at": "2026-10-02"
+ },
+ "nizashcho-myla|dreambeer|одеса|вулиця степова|34": {
+  "notFound": true,
+  "reason": "«TREF beer hub»: другое название",
+  "candidates": [
+   {
+    "id": "ChIJv-oNoZkzxkARUCstv4PXOx8",
+    "name": "TREF beer hub",
+    "address": "Люстдорфська дорога, 55з, Одеса, Одеська область, 65000",
+    "distanceM": 4495
+   }
+  ],
   "at": "2026-10-02"
  }
 }
