@@ -15,6 +15,8 @@ import { resolveCities, locateAll, failureReport } from './geocode/chain.mjs';
 import { cacheKey } from './geocode/match.mjs';
 import { buildMask } from './mask.mjs';
 import { renderClient, toClientPlace } from './render.mjs';
+import { fillPlaceIds } from './places.mjs';
+import { existsSync } from 'node:fs';
 
 const args = process.argv.slice(2);
 const opt = name => { const i = args.indexOf(name); if (i < 0) return null; const v = args[i + 1]; args.splice(i, 2); return v; };
@@ -24,6 +26,7 @@ const csvFile = opt('--csv');
 const cachePath = opt('--cache') || 'data/geocache.json';
 const citiesPath = opt('--cities') || 'data/cities.json';
 const outRoot = opt('--out') || 'dist';
+const placeIdsPath = opt('--placeids') || 'data/placeids.json';
 const ids = args.length ? args : listClients();
 if (csvFile && ids.length !== 1) { console.error('--csv работает только с одним клиентом'); process.exit(2); }
 
@@ -31,7 +34,9 @@ const readJson = p => JSON.parse(readFileSync(p, 'utf8'));
 const sortKeys = o => Object.fromEntries(Object.keys(o).sort().map(k => [k, o[k]]));
 const cache = readJson(cachePath);
 const cities = readJson(citiesPath);
+const placeIds = existsSync(placeIdsPath) ? readJson(placeIdsPath) : {};
 const save = () => {
+  if (!offline) writeFileSync(placeIdsPath, JSON.stringify(sortKeys(placeIds), null, 1) + '\n');
   writeFileSync(cachePath, JSON.stringify(sortKeys(cache), null, 1) + '\n');
   writeFileSync(citiesPath, JSON.stringify(sortKeys(cities), null, 2) + '\n');
 };
@@ -39,6 +44,7 @@ const summary = md => { if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(proc
 
 const providers = offline ? [] : providersFromEnv();
 if (!offline) console.log(`Геокодеры: ${providers.map(p => p.name).join(' → ')}`);
+if (!offline) console.log(process.env.GOOGLE_PLACES_API_KEY ? `Карточки Google: Places API${process.env.GOOGLE_SERVICE_ACCOUNT_JSON ? ' + запись в таблицу' : ' (без записи в таблицу: нет GOOGLE_SERVICE_ACCOUNT_JSON)'}` : 'Карточки Google: нет GOOGLE_PLACES_API_KEY, новые place_id не ищем');
 
 const result = { ok: [], failed: [] };
 const usedKeys = new Set();
@@ -65,6 +71,16 @@ for (const id of ids) {
       summary(md);
       result.failed.push(id);
       continue;
+    }
+
+    // Карточки Google для кнопки маршрута: ищем place_id для новых точек и пишем его в таблицу
+    const pr = await fillPlaceIds({ client, places, located, cities, cache: placeIds, env: offline ? {} : process.env, log: console.log });
+    save();
+    if (pr.notFound.length || pr.errors.length) {
+      const md = [`### ⚠️ ${id}: карточки Google`, '',
+        ...pr.notFound.map(x => `- строка ${x.p.row}, ${x.p.name}: карточка не найдена (${x.reasons.join('; ')}). Кнопка маршрута откроет поиск «название + адрес»; можно вписать gmaps_url вручную.`),
+        ...pr.errors.map(e => `- ошибка: ${e}`)].join('\n');
+      console.warn(md); summary(md);
     }
 
     const clientPlaces = places.map(p => toClientPlace(p, located.get(p)));
