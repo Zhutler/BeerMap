@@ -103,3 +103,26 @@ test('офлайн-сборка не ходит в сеть', async () => {
   assert.equal(calls.length, 0);
   assert.match(failures[0].attempts[0].reason, /офлайн/);
 });
+
+test('дом без литеры: только как запасной вариант', async () => {
+  assert.deepEqual(houseVariants('5-Б', true), ['5б', '5']);
+  assert.deepEqual(houseVariants('16а/2', true), ['16а/2', '16а', '16']);
+  assert.match(houseMismatch('5', '5-Б'), /другой дом/); // строго нельзя
+  assert.equal(houseMismatch('5', '5-Б', true), null);   // запасной вариант можно
+  assert.match(houseMismatch('7', '5-Б', true), /другой дом/);
+  // точный дом главнее, даже если в ответе он второй
+  const cands = [{ kind: 'address', lat: 46.43, lng: 30.76, street: 'Перлинна', house: '5' },
+    { kind: 'address', lat: 46.431, lng: 30.761, street: 'Перлинна', house: '5-Б' }];
+  const prov = { name: 'visicom', supports: () => true, search: async () => cands };
+  const p = P({ street: 'вулиця Перлинна', house: '5-Б' });
+  const cache = {};
+  const { located } = await locateAll([p], { cities, cache, providers: [prov], country: 'UKR' });
+  assert.equal(located.get(p).lat, 46.431);
+  // без точного: берём «5» и помечаем в кеше
+  const p2 = P({ street: 'вулиця Перлинна', house: '5-Б', row: 9 });
+  const cache2 = {};
+  const prov2 = { ...prov, search: async () => [cands[0]] };
+  const r2 = await locateAll([p2], { cities, cache: cache2, providers: [prov2], country: 'UKR' });
+  assert.equal(r2.located.get(p2).lat, 46.43);
+  assert.equal(Object.values(cache2)[0].houseApprox, true);
+});

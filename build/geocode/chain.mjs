@@ -70,13 +70,17 @@ export async function locateAll(places, { cities, cache, providers, country, off
         try { cands = await prov.search({ city: p.city, street, house: p.house, bbox, country }); }
         catch (e) { attempts.push({ provider: prov.name, street, reason: `ошибка: ${e.message}` }); continue; }
         if (!cands.length) { attempts.push({ provider: prov.name, street, reason: 'ничего не найдено' }); continue; }
-        // Для old_street улица в ответе должна совпадать со старым или новым названием
+        // Сначала точный дом; если его нет, тот же номер без литеры (5-Б → 5) на той же улице.
+        // Для old_street улица в ответе может совпадать со старым или новым названием.
         const reasons = [];
-        for (const c of cands) {
-          const r = rejectReason(c, { street, house: p.house, bbox });
-          const r2 = r && street !== p.street ? rejectReason(c, { street: p.street, house: p.house, bbox }) : r;
-          if (!r || !r2) { found = { c, prov: prov.name, street }; break; }
-          reasons.push(r);
+        for (const loose of [false, true]) {
+          for (const c of cands) {
+            const r = rejectReason(c, { street, house: p.house, bbox, loose });
+            const r2 = r && street !== p.street ? rejectReason(c, { street: p.street, house: p.house, bbox, loose }) : r;
+            if (!r || !r2) { found = { c, prov: prov.name, street, approx: loose }; break; }
+            if (!loose) reasons.push(r);
+          }
+          if (found) break;
         }
         if (found) break outer;
         attempts.push({ provider: prov.name, street, reason: [...new Set(reasons)].slice(0, 3).join('; ') });
@@ -85,9 +89,9 @@ export async function locateAll(places, { cities, cache, providers, country, off
 
     if (found) {
       const { c } = found;
-      cache[key] = { lat: +c.lat.toFixed(6), lng: +c.lng.toFixed(6), source: found.prov, matched: c.label || `${c.street} ${c.house}`, query: found.street, at: today() };
+      cache[key] = { lat: +c.lat.toFixed(6), lng: +c.lng.toFixed(6), source: found.prov, matched: c.label || `${c.street} ${c.house}`, query: found.street, ...(found.approx && { houseApprox: true }), at: today() };
       located.set(p, { lat: cache[key].lat, lng: cache[key].lng, source: found.prov });
-      log(`  ✓ ${p.name}, ${p.street} ${p.house} → ${found.prov}${found.street !== p.street ? ' (по старому названию)' : ''}`);
+      log(`  ✓ ${p.name}, ${p.street} ${p.house} → ${found.prov}${found.street !== p.street ? ' (по старому названию)' : ''}${found.approx ? ` (дом ${c.house}, без литеры)` : ''}`);
     } else {
       failures.push({ place: p, attempts });
       log(`  ✗ ${p.name}, ${p.street} ${p.house}`);

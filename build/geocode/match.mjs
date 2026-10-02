@@ -70,19 +70,24 @@ export function normHouse(h) {
     .replace(/^(буд|будинок|д|дом|корп)\.?/, '');
 }
 
-/** Варианты номера дома для поиска: «16а/2» → ['16а/2', '16а'] */
-export function houseVariants(h) {
+/**
+ * Варианты номера дома: «16а/2» → ['16а/2', '16а'].
+ * loose: ещё и номер без литеры (['16а/2', '16а', '16']): литерный корпус стоит рядом с основным домом.
+ */
+export function houseVariants(h, loose = false) {
   const n = normHouse(h);
   const out = [n];
   const base = n.split(/[\/\\]|корп|к(?=\d)/)[0];
   if (base && base !== n) out.push(base);
+  const digits = n.match(/^\d+/)?.[0];
+  if (loose && digits && !out.includes(digits)) out.push(digits);
   return out;
 }
 
 /** Совпадает ли номер дома. Поддерживает «30;32» и «30,32» у результата. */
-export function houseMismatch(found, ours) {
+export function houseMismatch(found, ours, loose = false) {
   if (!found) return 'нет номера дома (результат уровня улицы)';
-  const want = new Set(houseVariants(ours));
+  const want = new Set(houseVariants(ours, loose));
   const got = String(found).split(/[;,]/).map(normHouse);
   return got.some(g => want.has(g)) ? null : `другой дом: «${found}»`;
 }
@@ -94,11 +99,11 @@ export const inBbox = (b, lat, lng) => lat >= b[0] && lat <= b[2] && lng >= b[1]
  * Проверка кандидата. cand: { lat, lng, kind, street, house }.
  * Возвращает null (подходит) или текст причины.
  */
-export function rejectReason(cand, { street, house, bbox }) {
+export function rejectReason(cand, { street, house, bbox, loose = false }) {
   if (cand.kind !== 'address') return `тип результата «${cand.kind}», нужен адрес`;
   if (!Number.isFinite(cand.lat) || !Number.isFinite(cand.lng)) return 'нет координат';
   if (!inBbox(bbox, cand.lat, cand.lng)) return `точка вне города (${cand.lat.toFixed(5)}, ${cand.lng.toFixed(5)})`;
-  return streetMismatch(cand.street, street) || houseMismatch(cand.house, house);
+  return streetMismatch(cand.street, street) || houseMismatch(cand.house, house, loose);
 }
 
 /** Ключ кеша: город|улица без типа|дом */
