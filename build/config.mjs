@@ -15,9 +15,14 @@ const DEFAULTS = {
 const COLOR_KEYS = ['cream', 'paper', 'navy', 'navy2', 'orange', 'gold', 'line', 'muted'];
 const BASEMAP_KEYS = ['background', 'water', 'park', 'building', 'label'];
 const HEX = /^#[0-9a-f]{3,8}$/i;
+export const MARKER_SHAPES = ['cap', 'hex', 'drop'];
 
-export const listClients = () => readdirSync(CLIENTS_DIR, { withFileTypes: true })
-  .filter(d => d.isDirectory() && existsSync(join(CLIENTS_DIR, d.name, 'client.json'))).map(d => d.name).sort();
+export const listClients = ({ includeDrafts = false } = {}) => readdirSync(CLIENTS_DIR, { withFileTypes: true })
+  .filter(d => d.isDirectory() && existsSync(join(CLIENTS_DIR, d.name, 'client.json')))
+  .map(d => d.name)
+  // черновики (draft: true) ежедневная сборка пропускает; собрать можно явно: node build/build.mjs <id>
+  .filter(id => includeDrafts || !JSON.parse(readFileSync(join(CLIENTS_DIR, id, 'client.json'), 'utf8')).draft)
+  .sort();
 
 export function loadClient(id) {
   const dir = join(CLIENTS_DIR, id);
@@ -48,7 +53,7 @@ export function loadClient(id) {
   for (const k of COLOR_KEYS) if (!HEX.test(c.colors?.[k] ?? '')) errs.push(`colors.${k}`);
   for (const k of BASEMAP_KEYS) if (!HEX.test(c.basemap?.[k] ?? '')) errs.push(`basemap.${k}`);
   for (const t of ['shop', 'bar']) if (!HEX.test(c.marker.colors?.[t] ?? '')) errs.push(`marker.colors.${t}`);
-  if (c.marker.shape !== 'cap') errs.push(`marker.shape «${c.marker.shape}» (пока есть только cap)`);
+  if (!MARKER_SHAPES.includes(c.marker.shape)) errs.push(`marker.shape «${c.marker.shape}» (есть: ${MARKER_SHAPES.join(', ')})`);
   if (!Array.isArray(c.countries) || !c.countries.length) errs.push('countries');
   if (errs.length) throw new Error(`${path}: не заполнено или неверно: ${errs.join(', ')}`);
   return c;
