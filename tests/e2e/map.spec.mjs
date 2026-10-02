@@ -103,6 +103,22 @@ for (const id of clients) {
       expect(await page.evaluate(() => __beermap.map.getZoom())).toBeGreaterThanOrEqual(15);
     });
 
+    test('«Що поруч»: камера приближается к человеку, подсказка не пропадает сразу', async ({ page, context, isMobile }) => {
+      // первая точка списка данных: у Loca Deserta это единственная точка в Одессе (раньше камера улетала на всю Украину)
+      const p = await page.evaluate(() => __beermap.places[0].c);
+      const meLL = [p[0] + 0.002, p[1] + 0.002];
+      await context.grantPermissions(['geolocation']);
+      await context.setGeolocation({ latitude: meLL[0], longitude: meLL[1] });
+      await page.waitForTimeout(2500); // стартовый облёт закончился
+      await page.locator(isMobile ? '#fab' : '#near').click();
+      await page.waitForTimeout(3000);
+      const r = await page.evaluate(() => { const { map } = __beermap; const c = map.getCenter(); return { zoom: map.getZoom(), c: [c.lat, c.lng] }; });
+      expect(r.zoom).toBeGreaterThanOrEqual(13);
+      expect(Math.abs(r.c[0] - meLL[0]) + Math.abs(r.c[1] - meLL[1])).toBeLessThan(0.05);
+      if (isMobile) await expect(page.locator('#toast.show')).toContainText('Найближче');
+      else await expect(page.locator('#status')).toContainText('Найближче');
+    });
+
     test('поиск фильтрует список и маркеры', async ({ page, isMobile }) => {
       const name = await page.evaluate(() => __beermap.places[0].name);
       if (isMobile) await page.locator('#handle').click();
