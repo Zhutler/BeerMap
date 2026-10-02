@@ -14,7 +14,7 @@ test('точка для браузера: только нужные поля', (
 });
 
 test('все конфиги клиентов валидны', () => {
-  for (const id of listClients()) {
+  for (const id of listClients({ includeDrafts: true })) {
     const c = loadClient(id);
     assert.ok(c.texts.mobileHeading, id);
   }

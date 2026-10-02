@@ -1,0 +1,57 @@
+{
+  "name": "Loca Deserta",
+  "draft": true,
+  "sheetCsvUrl": "https://docs.google.com/spreadsheets/d/1jLWLh9hizyTO1xpQiyxV-J6WmY_bJn9fTRbx97szLe8/export?format=csv",
+  "cloudflareProject": "loca-deserta-map",
+  "githubPages": true,
+  "countries": [
+    "UKR"
+  ],
+  "texts": {
+    "title": "Де купити · Loca Deserta",
+    "heading": "Де купити?",
+    "subheading": "Тут продають Loca Deserta",
+    "panelLabel": "Де купити Loca Deserta",
+    "logoAlt": "Loca Deserta"
+  },
+  "images": {
+    "logo": "logo.svg"
+  },
+  "font": {
+    "family": "Montserrat",
+    "googleWeights": [
+      500,
+      600,
+      700,
+      800,
+      900
+    ],
+    "fallback": "'Segoe UI', Roboto, Arial, sans-serif"
+  },
+  "colors": {
+    "cream": "#F3EFE6",
+    "paper": "#FBF9F4",
+    "navy": "#2B2B2B",
+    "navy2": "#4A4A4A",
+    "orange": "#C8862A",
+    "gold": "#A8873E",
+    "line": "#DED8C9",
+    "muted": "#75716A"
+  },
+  "basemap": {
+    "background": "#F3EFE6",
+    "water": "#C9DDE3",
+    "park": "#E1E4CF",
+    "building": "#E6E1D4",
+    "label": "#4A4A4A"
+  },
+  "marker": {
+    "shape": "hex",
+    "text": "LD",
+    "colors": {
+      "shop": "#2B2B2B",
+      "bar": "#C8862A"
+    }
+  },
+  "cityOrder": []
+}
