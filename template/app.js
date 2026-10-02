@@ -161,7 +161,8 @@ const km = (a, b) => {
 };
 const fmtKm = d => d < 1 ? `${Math.round(d * 1000 / 10) * 10} м` : d < 20 ? `${d.toFixed(1).replace('.', ',')} км` : `${Math.round(d)} км`;
 
-const openCities = new Set(CITY_ORDER);
+// розгорнуті міста: з cityOrder, а якщо порядок не задано, то головне місто (де найбільше точок)
+const openCities = new Set(CITY_ORDER.length ? CITY_ORDER : [cfg.focusCity].filter(Boolean));
 function placeLi(p, i, dist) {
   const addr = `${shortStreet(p.street)}, ${p.house}${p.old ? ` (кол. ${shortStreet(p.old)})` : ''}`;
   return `<li class="place${i === activeIdx ? ' active' : ''}" data-i="${i}" tabindex="0" role="button">

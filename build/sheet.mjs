@@ -75,7 +75,7 @@ export function parseSheet(text) {
   const seen = new Map();
   rows.forEach((r, i) => {
     const row = i + 2;
-    if (COLUMNS.every(c => !clean(r[c]))) return; // пустая строка
+    if (COLUMNS.every(c => c === 'active' || !clean(r[c]))) return; // пустая строка (галочка/выбор в active не считается)
     const rowErrors = [];
     const err = msg => rowErrors.push({ row, name: clean(r.name), msg });
     const p = {
