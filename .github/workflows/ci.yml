@@ -18,10 +18,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - name: Офлайн-сборка из фикстуры
-        run: node build/build.mjs nizashcho-myla --offline --csv tests/fixtures/nizashcho-myla.csv --cache tests/fixtures/geocache.json --cities tests/fixtures/cities.json
+      - name: Офлайн-сборка из фикстур (все клиенты с tests/fixtures/<id>.csv)
+        run: |
+          for f in tests/fixtures/*.csv; do
+            id=$(basename "$f" .csv)
+            node build/build.mjs "$id" --offline --csv "$f" --cache tests/fixtures/geocache.json --cities tests/fixtures/cities.json
+          done
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - name: Playwright
+        run: CLIENTS=$(ls tests/fixtures/*.csv | xargs -n1 basename | sed 's/\.csv$//' | paste -sd, -) npx playwright test
       - if: always()
         uses: actions/upload-artifact@v4
         with:

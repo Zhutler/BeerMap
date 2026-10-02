@@ -8,14 +8,15 @@
     "UKR"
   ],
   "texts": {
-    "title": "Де купити · Loca Deserta",
-    "heading": "Де купити?",
-    "subheading": "Тут продають Loca Deserta",
-    "panelLabel": "Де купити Loca Deserta",
-    "logoAlt": "Loca Deserta"
+    "title": "Де випити меду? · Loca Deserta Meadery",
+    "heading": "Де випити меду?",
+    "subheading": "Тут наливають і продають Loca Deserta",
+    "panelLabel": "Де купити медовуху Loca Deserta",
+    "logoAlt": "Loca Deserta Meadery"
   },
   "images": {
-    "logo": "logo.svg"
+    "logo": "logo.jpg",
+    "near": "near.png"
   },
   "font": {
     "family": "Montserrat",
@@ -29,28 +30,28 @@
     "fallback": "'Segoe UI', Roboto, Arial, sans-serif"
   },
   "colors": {
-    "cream": "#F3EFE6",
-    "paper": "#FBF9F4",
-    "navy": "#2B2B2B",
-    "navy2": "#4A4A4A",
-    "orange": "#C8862A",
-    "gold": "#A8873E",
-    "line": "#DED8C9",
-    "muted": "#75716A"
+    "cream": "#F6F1F3",
+    "paper": "#FFFBFC",
+    "navy": "#1A1418",
+    "navy2": "#4B3A44",
+    "orange": "#C9467F",
+    "gold": "#B85C86",
+    "line": "#EADCE3",
+    "muted": "#7A6B73"
   },
   "basemap": {
-    "background": "#F3EFE6",
-    "water": "#C9DDE3",
-    "park": "#E1E4CF",
-    "building": "#E6E1D4",
-    "label": "#4A4A4A"
+    "background": "#F6F1F3",
+    "water": "#D6E3EA",
+    "park": "#E6E9DA",
+    "building": "#ECE4E7",
+    "label": "#4B3A44"
   },
   "marker": {
     "shape": "hex",
-    "text": "LD",
+    "text": "МЕД",
     "colors": {
-      "shop": "#2B2B2B",
-      "bar": "#C8862A"
+      "shop": "#1A1418",
+      "bar": "#C9467F"
     }
   },
   "cityOrder": []
