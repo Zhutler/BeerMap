@@ -91,7 +91,7 @@ export function parseNominatim(json) {
     return {
       lat: Number(x.lat), lng: Number(x.lon),
       kind: hn ? 'address' : (x.addresstype || x.type || 'other'),
-      street, house: hn, label: x.display_name || '',
+      street, house: hn, label: x.display_name || '', name: x.name || '', category: x.category || x.class || '',
     };
   });
 }
@@ -117,6 +117,12 @@ export function nominatim({ minIntervalMs = 1100, userAgent = USER_AGENT } = {})
         res = res.concat(parseNominatim(await call({ ...common, q: `${street} ${house}, ${city}` })));
       }
       return res;
+    },
+    /** Заведение по названию в городе (POI из OSM). */
+    async searchPlace({ name, city, bbox, country }) {
+      const common = { countrycodes: iso2(country), viewbox: [bbox[1], bbox[2], bbox[3], bbox[0]].join(','), bounded: '1' };
+      return parseNominatim(await call({ ...common, q: `${name}, ${city}` }))
+        .map(c => ({ ...c, kind: 'poi' }));
     },
     /** bbox города по названию. Возвращает список кандидатов-населённых пунктов. */
     async city(name, country) {

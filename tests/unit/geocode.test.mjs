@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { streetMismatch, houseMismatch, houseVariants, normHouse, rejectReason, cacheKey } from '../../build/geocode/match.mjs';
+import { streetMismatch, houseMismatch, houseVariants, normHouse, rejectReason, cacheKey, nameMatches, poiRejectReason } from '../../build/geocode/match.mjs';
 import { parseVisicom, parseMaptiler, parseNominatim } from '../../build/geocode/providers.mjs';
 import { locateAll, failureReport } from '../../build/geocode/chain.mjs';
 
@@ -125,4 +125,27 @@ test('дом без литеры: только как запасной вари�
   const r2 = await locateAll([p2], { cities, cache: cache2, providers: [prov2], country: 'UKR' });
   assert.equal(r2.located.get(p2).lat, 46.43);
   assert.equal(Object.values(cache2)[0].houseApprox, true);
+});
+
+test('заведение по названию: на нашей улице и главнее адреса', async () => {
+  assert.ok(nameMatches('Shanson', 'Shanson Bar'));
+  assert.ok(nameMatches('Бородате пиво', 'Бородате Пиво'));
+  assert.ok(!nameMatches('Кораблик', 'Shanson Bar'));
+  const want = { name: 'Shanson Bar', street: 'Фонтанська дорога', house: '153', bbox: ODESA };
+  assert.equal(poiRejectReason({ lat: 46.4015, lng: 30.7548, name: 'Shanson Bar', street: 'Фонтанська дорога', house: '', category: 'amenity' }, want), null);
+  assert.match(poiRejectReason({ lat: 46.47, lng: 30.73, name: 'Shanson Bar', street: 'Дерибасівська вулиця', house: '1', category: 'amenity' }, want), /друг(ая|ой тип) улиц/);
+  // сеть: из нескольких филиалов берём тот, что на нашей улице
+  const calls = [];
+  const prov = {
+    name: 'nominatim', supports: () => true,
+    async searchPlace() { calls.push('poi'); return [
+      { kind: 'poi', lat: 46.47, lng: 30.71, name: 'BuduPivo', street: 'Болгарська вулиця', house: '87а', category: 'shop' },
+      { kind: 'poi', lat: 46.46, lng: 30.70, name: 'BuduPivo', street: 'Головківська вулиця', house: '25', category: 'shop' }]; },
+    async search() { calls.push('addr'); return []; },
+  };
+  const p = P({ name: 'BuduPivo', street: 'вулиця Головківська', house: '25' });
+  const { located } = await locateAll([p], { cities, cache: {}, providers: [prov], country: 'UKR' });
+  assert.equal(located.get(p).lat, 46.46);
+  assert.equal(located.get(p).source, 'nominatim-poi');
+  assert.deepEqual(calls, ['poi']); // по адресу уже не искали
 });

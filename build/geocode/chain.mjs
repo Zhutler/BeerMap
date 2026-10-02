@@ -1,5 +1,5 @@
 // Координаты для точек: таблица (lat/lng) → кеш → провайдеры по очереди (street, затем old_street).
-import { rejectReason, cacheKey, inBbox } from './match.mjs';
+import { rejectReason, poiRejectReason, cacheKey, inBbox } from './match.mjs';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -64,7 +64,23 @@ export async function locateAll(places, { cities, cache, providers, country, off
     const attempts = [];
     let found = null;
     const streets = [p.street, p.oldStreet].filter(Boolean);
-    outer: for (const prov of providers.filter(x => x.supports(country))) {
+    const usable = providers.filter(x => x.supports(country));
+    // 3a. Сначала заведение по названию: точнее адреса, если в одном доме несколько мест
+    for (const prov of usable.filter(x => x.searchPlace)) {
+      if (found) break;
+      let cands;
+      try { cands = await prov.searchPlace({ name: p.name, city: p.city, bbox, country }); }
+      catch (e) { attempts.push({ provider: `${prov.name} (название)`, reason: `ошибка: ${e.message}` }); continue; }
+      const reasons = [];
+      for (const c of cands) {
+        const r = [p.street, p.oldStreet].filter(Boolean).map(street => poiRejectReason(c, { name: p.name, street, house: p.house, bbox }));
+        if (r.some(x => !x)) { found = { c, prov: `${prov.name}-poi`, street: p.street, approx: false }; break; }
+        reasons.push(r[0]);
+      }
+      if (!found) attempts.push({ provider: `${prov.name} (название)`, reason: cands.length ? [...new Set(reasons)].slice(0, 3).join('; ') : 'ничего не найдено' });
+    }
+    // 3b. Потом адрес
+    outer: for (const prov of found ? [] : usable) {
       for (const street of streets) {
         let cands;
         try { cands = await prov.search({ city: p.city, street, house: p.house, bbox, country }); }

@@ -111,3 +111,24 @@ export function cacheKey({ city, street, house }) {
   const s = parseStreet(street);
   return [normText(city), [s.type ?? '', ...s.tokens].join(' ').trim(), normHouse(house)].join('|');
 }
+
+const letters = s => normText(s).replace(/[^\p{L}\p{N}]/gu, '');
+/** Название заведения совпадает: одно содержит другое (без пробелов и знаков) */
+export const nameMatches = (found, ours) => {
+  const a = letters(found), b = letters(ours);
+  return !!a && !!b && (a.includes(b) || b.includes(a));
+};
+
+/**
+ * Проверка заведения, найденного по названию: в городе, название совпадает, на нашей улице,
+ * дом совпадает или у заведения его нет. Возвращает null или причину.
+ */
+export function poiRejectReason(cand, { name, street, house, bbox }) {
+  if (!Number.isFinite(cand.lat) || !Number.isFinite(cand.lng)) return 'нет координат';
+  if (!inBbox(bbox, cand.lat, cand.lng)) return 'заведение вне города';
+  if (!nameMatches(cand.name, name)) return `другое название: «${cand.name}»`;
+  if (['highway', 'boundary', 'place'].includes(cand.category)) return `не заведение (${cand.category})`;
+  const sm = streetMismatch(cand.street, street);
+  if (sm) return sm;
+  return cand.house ? houseMismatch(cand.house, house, true) : null;
+}
