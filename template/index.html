@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{title}}</title>
+<meta name="description" content="{{subheading}}">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{subheading}}">
+<meta property="og:image" content="{{logo}}">
+<meta name="theme-color" content="{{themeColor}}">
+<link rel="icon" href="{{logo}}">
+<link rel="stylesheet" href="{{vendor}}/leaflet/leaflet.css">
+<link rel="stylesheet" href="{{vendor}}/leaflet.markercluster/MarkerCluster.css">
+<link rel="stylesheet" href="{{vendor}}/maplibre-gl/maplibre-gl.css">
+{{{fontLinks}}}
+<style>
+{{{rootVars}}}
+{{{css}}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="panel" id="panel" aria-label="{{panelLabel}}">
+    <button class="handle" id="handle" aria-label="Розгорнути список"><span></span></button>
+    <div class="head">
+      <img src="{{logo}}" alt="{{logoAlt}}">
+      <div>
+        <h1>{{heading}}</h1>
+        <p>{{subheading}}</p>
+      </div>
+    </div>
+    <div class="tools">
+      <label class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>
+        <input id="q" type="search" placeholder="Місто, вулиця або назва" aria-label="Пошук">
+      </label>
+      <div class="row" role="group" aria-label="Тип місця">
+        <button class="chip" data-f="all" aria-pressed="true">Усі</button>
+        <button class="chip" data-f="shop" aria-pressed="false">{{filterShop}}</button>
+        <button class="chip" data-f="bar" aria-pressed="false">{{filterBar}}</button>
+      </div>
+      <button class="near" id="near"><img src="{{near}}" alt="">Що поруч зі мною</button>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </aside>
+  <div id="map" role="region" aria-label="Карта"></div>
+  <button class="fab" id="fab" aria-label="Що поруч зі мною"><img src="{{near}}" alt=""></button>
+  <div class="mhead"><img src="{{logo}}" alt="{{name}}"><b>{{mobileHeading}}</b></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="{{vendor}}/leaflet/leaflet.js"></script>
+<script src="{{vendor}}/leaflet.markercluster/leaflet.markercluster.js"></script>
+<script src="{{vendor}}/maplibre-gl/maplibre-gl.js"></script>
+<script src="{{vendor}}/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+<script id="map-data" type="application/json">{{{data}}}</script>
+<script>
+{{{js}}}
+</script>
+</body>
+</html>
