@@ -41,7 +41,7 @@
     "distanceM": 1273
    }
   ],
-  "at": "2026-10-02"
+  "at": "2026-11-01"
  },
  "loca-deserta|гонір|івано-франківськ|вулиця деповська|15": {
   "placeId": "ChIJTWs2zBbBMEcRoYG1prH9lCc",
@@ -57,16 +57,28 @@
  },
  "nizashcho-myla|budupivo|одеса|вулиця болгарська|87а": {
   "notFound": true,
-  "reason": "«Буду Пиво»: 1396 м от нашей точки",
+  "reason": "«Буду Пиво»: 1396 м от нашей точки; «БЛАГО МАГАЗИН»: другое название",
   "candidates": [
    {
     "id": "ChIJ_RHfgdgxxkARzUqSdI4g7Nw",
     "name": "Буду Пиво",
     "address": "вулиця Олександра Свіща, 38, Одеса, Одеська область, 65091",
     "distanceM": 1396
+   },
+   {
+    "id": "ChIJMesUSSkyxkARTVrGEISWRqc",
+    "name": "БЛАГО МАГАЗИН",
+    "address": "Болгарська вулиця, 39, Одеса, Одеська область, 65000",
+    "distanceM": 549
+   },
+   {
+    "id": "ChIJD8H8XKMlxkARSSN1JA39-Y4",
+    "name": "Два Пивовара",
+    "address": "Миколаївська дорога, 140, Одеса, Одеська область, 65102",
+    "distanceM": 8911
    }
   ],
-  "at": "2026-10-02"
+  "at": "2026-11-01"
  },
  "nizashcho-myla|dreambeer|одеса|вулиця степова|34": {
   "notFound": true,
